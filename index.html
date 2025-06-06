@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Live SMS Segment Calculator</title>
+  <title>SMS Segment Calculator</title>
   <style>
     body {
       font-family: sans-serif;
@@ -11,74 +11,45 @@
       margin: auto;
     }
     label {
-      font-weight: bold;
       display: block;
-      margin-bottom: 0.5rem;
+      margin-top: 1rem;
+      font-weight: bold;
     }
-    textarea {
+    input, select, button {
       width: 100%;
-      padding: 0.75rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      min-height: 120px;
-      resize: vertical;
+      padding: 0.5rem;
+      margin-top: 0.25rem;
     }
     .result {
       margin-top: 2rem;
-      font-size: 1rem;
+      font-weight: bold;
+      font-size: 1.2rem;
       background: #f5f5f5;
       padding: 1rem;
       border-radius: 8px;
-      line-height: 1.6;
     }
   </style>
 </head>
 <body>
-
   <h1>SMS Segment Calculator</h1>
 
-  <label for="message">Type your SMS message below:</label>
-  <textarea id="message" placeholder="Start typing..."></textarea>
+  <label for="contacts">Number of Contacts:</label>
+  <input type="number" id="contacts" value="100">
+
+  <label for="characters">Average Characters per Message:</label>
+  <input type="number" id="characters" value="160">
+
+  <label for="mms">Is MMS?</label>
+  <select id="mms">
+    <option value="no">No</option>
+    <option value="yes">Yes</option>
+  </select>
+
+  <button onclick="calculate()">Calculate</button>
 
   <div class="result" id="result"></div>
 
   <script>
-    const textarea = document.getElementById("message");
-    const result = document.getElementById("result");
-
-    function isGSM7(text) {
-      const gsm7Regex = /^[\x00-\x7F€£¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ!"#¤%&'()*+,\-.\/:;<=>?¡ÄÖÑÜ§¿äöñüà^{}\[~\]|€@\s]+$/;
-      return gsm7Regex.test(text);
-    }
-
     function calculate() {
-      const message = textarea.value;
-      const charCount = message.length;
-
-      let encoding, charsPerSegment;
-
-      if (!isGSM7(message)) {
-        encoding = "UCS-2";
-        charsPerSegment = charCount <= 70 ? 70 : 67;
-      } else {
-        encoding = "GSM-7";
-        charsPerSegment = charCount <= 160 ? 160 : 153;
-      }
-
-      const segments = Math.ceil(charCount / charsPerSegment);
-
-      result.innerHTML = `
-        Encoding Type: <strong>${encoding}</strong><br>
-        Characters Used: <strong>${charCount}</strong><br>
-        Characters Per Segment: <strong>${charsPerSegment}</strong><br>
-        Total SMS Segments: <strong>${segments}</strong>
-      `;
-    }
-
-    textarea.addEventListener("input", calculate);
-    calculate(); // Run once on page load
-  </script>
-
-</body>
-</html>
+      const contacts = parseInt(document.getElementById("contacts").value) || 0;
+      const chars = parseInt(document.getEl
