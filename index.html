@@ -25,6 +25,12 @@
       font-weight: 600;
     }
 
+    .subheader {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+
     input, select, textarea, button {
       width: 100%;
       padding: 0.75rem;
@@ -81,13 +87,8 @@
   <input type="number" id="contacts" value="100" min="0">
 
   <label for="message">Type your message:</label>
+  <div class="subheader">Don't forget to include an opt-out message (e.g., "Reply STOP to unsubscribe") in bulk campaigns.</div>
   <textarea id="message" placeholder="Enter your SMS message here..." oninput="calculate()"></textarea>
-
-  <label for="mms">Is this an MMS message?</label>
-  <select id="mms" onchange="calculate()">
-    <option value="no">No</option>
-    <option value="yes">Yes</option>
-  </select>
 
   <button onclick="calculate()">Calculate</button>
 
@@ -114,7 +115,6 @@
     function calculate() {
       const contacts = parseInt(document.getElementById("contacts").value) || 0;
       const message = document.getElementById("message").value || "";
-      const isMMS = document.getElementById("mms").value === "yes";
 
       const encoding = isGSM7(message) ? "GSM-7" : "UCS-2";
       const charCount = message.length;
@@ -122,7 +122,7 @@
       const singleLimit = encoding === "GSM-7" ? 160 : 70;
       const multiLimit = encoding === "GSM-7" ? 153 : 67;
       const segmentSize = charCount > singleLimit ? multiLimit : singleLimit;
-      const segmentsPerContact = isMMS ? 1 : Math.ceil(charCount / segmentSize);
+      const segmentsPerContact = Math.ceil(charCount / segmentSize);
       const totalSegments = contacts * segmentsPerContact;
 
       document.getElementById("result").innerHTML = `
