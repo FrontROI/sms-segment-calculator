@@ -3,30 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <title>SMS Segment Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
-      font-family: sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding: 2rem;
-      max-width: 600px;
+      max-width: 700px;
       margin: auto;
+      background-color: #f9f9f9;
+      color: #333;
     }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
     label {
       display: block;
       margin-top: 1rem;
-      font-weight: bold;
+      font-weight: 600;
     }
+
     input, select, textarea, button {
       width: 100%;
-      padding: 0.5rem;
+      padding: 0.75rem;
       margin-top: 0.25rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 1rem;
     }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      font-weight: bold;
+      margin-top: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
     .result {
       margin-top: 2rem;
-      font-weight: bold;
-      font-size: 1.1rem;
-      background: #f5f5f5;
-      padding: 1rem;
+      background: #ffffff;
+      border: 1px solid #ddd;
+      padding: 1rem 1.5rem;
       border-radius: 8px;
+      font-size: 1.05rem;
+      box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    }
+
+    .result strong {
+      color: #000;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
     }
   </style>
 </head>
@@ -34,12 +78,12 @@
   <h1>SMS Segment Calculator</h1>
 
   <label for="contacts">Number of Contacts:</label>
-  <input type="number" id="contacts" value="100">
+  <input type="number" id="contacts" value="100" min="0">
 
   <label for="message">Type your message:</label>
-  <textarea id="message" rows="5" oninput="calculate()"></textarea>
+  <textarea id="message" placeholder="Enter your SMS message here..." oninput="calculate()"></textarea>
 
-  <label for="mms">Is MMS?</label>
+  <label for="mms">Is this an MMS message?</label>
   <select id="mms" onchange="calculate()">
     <option value="no">No</option>
     <option value="yes">Yes</option>
@@ -47,7 +91,9 @@
 
   <button onclick="calculate()">Calculate</button>
 
-  <div class="result" id="result"></div>
+  <div class="result" id="result">
+    Enter your message above to calculate segments sent.
+  </div>
 
   <script>
     const gsm7Chars =
@@ -57,8 +103,8 @@
       "¿abcdefghijklmnopqrstuvwxyzäöñüà";
 
     function isGSM7(text) {
-      for (let char of text) {
-        if (!gsm7Chars.includes(char)) {
+      for (let i = 0; i < text.length; i++) {
+        if (!gsm7Chars.includes(text[i])) {
           return false;
         }
       }
@@ -70,4 +116,25 @@
       const message = document.getElementById("message").value || "";
       const isMMS = document.getElementById("mms").value === "yes";
 
-      const encoding = isGSM7(message) ? "
+      const encoding = isGSM7(message) ? "GSM-7" : "UCS-2";
+      const charCount = message.length;
+
+      const singleLimit = encoding === "GSM-7" ? 160 : 70;
+      const multiLimit = encoding === "GSM-7" ? 153 : 67;
+      const segmentSize = charCount > singleLimit ? multiLimit : singleLimit;
+      const segmentsPerContact = isMMS ? 1 : Math.ceil(charCount / segmentSize);
+      const totalSegments = contacts * segmentsPerContact;
+
+      document.getElementById("result").innerHTML = `
+        📡 <strong>Encoding:</strong> ${encoding}<br>
+        ✍️ <strong>Characters Used:</strong> ${charCount}<br>
+        🔢 <strong>Segment Size:</strong> ${segmentSize} characters<br>
+        📬 <strong>Segments per Contact:</strong> ${segmentsPerContact}<br>
+        📤 <strong>Total Segments Sent:</strong> ${totalSegments}
+      `;
+    }
+
+    window.onload = calculate;
+  </script>
+</body>
+</html>
