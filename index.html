@@ -15,17 +15,15 @@
       margin-top: 1rem;
       font-weight: bold;
     }
-    textarea {
+    input, select, textarea, button {
       width: 100%;
       padding: 0.5rem;
-      height: 150px;
       margin-top: 0.25rem;
-      font-family: monospace;
     }
     .result {
       margin-top: 2rem;
       font-weight: bold;
-      font-size: 1rem;
+      font-size: 1.1rem;
       background: #f5f5f5;
       padding: 1rem;
       border-radius: 8px;
@@ -35,14 +33,24 @@
 <body>
   <h1>SMS Segment Calculator</h1>
 
-  <label for="message">Type your SMS message:</label>
-  <textarea id="message" oninput="calculate()"></textarea>
+  <label for="contacts">Number of Contacts:</label>
+  <input type="number" id="contacts" value="100">
+
+  <label for="message">Type your message:</label>
+  <textarea id="message" rows="5" oninput="calculate()"></textarea>
+
+  <label for="mms">Is MMS?</label>
+  <select id="mms" onchange="calculate()">
+    <option value="no">No</option>
+    <option value="yes">Yes</option>
+  </select>
+
+  <button onclick="calculate()">Calculate</button>
 
   <div class="result" id="result"></div>
 
   <script>
-    // GSM-7 default character set
-    const gsm7Chars = 
+    const gsm7Chars =
       "@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞ" +
       " !\"#¤%&'()*+,-./0123456789:;<=>?" +
       "¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§" +
@@ -58,13 +66,8 @@
     }
 
     function calculate() {
-      const message = document.getElementById("message").value;
-      const isGSM = isGSM7(message);
-      const charCount = message.length;
+      const contacts = parseInt(document.getElementById("contacts").value) || 0;
+      const message = document.getElementById("message").value || "";
+      const isMMS = document.getElementById("mms").value === "yes";
 
-      const encoding = isGSM ? "GSM-7" : "UCS-2";
-      const singleLimit = isGSM ? 160 : 70;
-      const multiLimit = isGSM ? 153 : 67;
-
-      const segmentLength = charCount > singleLimit ? multiLimit : singleLimit;
-      const segments = Math.ceil(charCou
+      const encoding = isGSM7(message) ? "
