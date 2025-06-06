@@ -23,7 +23,7 @@
     .result {
       margin-top: 2rem;
       font-weight: bold;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       background: #f5f5f5;
       padding: 1rem;
       border-radius: 8px;
@@ -36,8 +36,8 @@
   <label for="contacts">Number of Contacts:</label>
   <input type="number" id="contacts" value="100">
 
-  <label for="characters">Average Characters per Message:</label>
-  <input type="number" id="characters" value="160">
+  <label for="message">Message Text:</label>
+  <textarea id="message" rows="4" placeholder="Type your message here..."></textarea>
 
   <label for="mms">Is MMS?</label>
   <select id="mms">
@@ -50,23 +50,6 @@
   <div class="result" id="result"></div>
 
   <script>
-    function calculate() {
-      const contacts = parseInt(document.getElementById("contacts").value) || 0;
-      const chars = parseInt(document.getElementById("characters").value) || 0;
-      const isMMS = document.getElementById("mms").value === "yes";
-
-      const smsSegmentLength = 160;
-      const mmsCost = 0.02;
-      const smsCost = 0.0075;
-      const segments = Math.ceil(chars / smsSegmentLength);
-      const messages = isMMS ? 1 : segments;
-      const totalCost = contacts * messages * (isMMS ? mmsCost : smsCost);
-
-      document.getElementById("result").innerHTML = `
-        Total Messages Sent: ${contacts * messages}<br>
-        Estimated Cost: $${totalCost.toFixed(4)}
-      `;
-    }
-  </script>
-</body>
-</html>
+    function isGSM7(text) {
+      // GSM-7 basic character set (not exhaustive but covers common chars)
+      const gsm7Regex = /^[\x00]()
